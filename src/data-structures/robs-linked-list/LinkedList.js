@@ -1,13 +1,15 @@
-import LinkedNode from "./LinkedListNode";
+// import LinkedListNode from "./LinkedListNode";
 
-export default class LinkedList {
-  constructor() {
+const defaultComparatorFunction = _.isEqual;
+class LinkedList {
+  constructor(comparatorFunction = defaultComparatorFunction) {
     this.head = null;
     this.tail = null;
+    this.compare = comparatorFunction;
   }
 
   add(value) {
-    const newNode = new LinkedNode(value);
+    const newNode = new LinkedListNode(value);
 
     if (!this.head) {
       this.head = newNode;
@@ -24,7 +26,7 @@ export default class LinkedList {
       return;
     }
 
-    const newNode = new LinkedNode(value);
+    const newNode = new LinkedListNode(value);
     // make this node the new head by shifting the current head
     newNode.next = this.head;
 
@@ -34,40 +36,41 @@ export default class LinkedList {
     }
   }
 
-  search(value) {
-    const errorMsg = `Sorry, your value of ${value} was not found 👎🏽`;
-    const successMsg = `Great Success! Your value of ${value} was found 🥳`;
+  search({ value, callback = undefined }) {
     let currentHead = this.head;
 
-    if (!this.head) {
-      return "Nothing exists here so nothing to look for 🤦🏽‍♂️";
-    }
-
     while (currentHead) {
+      // if we specified a callback then use that to find the value
+      if (callback && callback(currentHead.value)) {
+        return currentHead;
+      }
+
       if (currentHead.value === value) {
-        return successMsg;
+        return currentHead;
       } else {
         currentHead = currentHead.next;
       }
     }
 
-    // nothing is found so display error message
-    return errorMsg;
+    return null;
   }
 
-  delete(value) {
+  delete({ value, callback = this.compare }) {
+    if (!this.head) {
+      return null;
+    }
+    let deletedNode = null;
     // value that will serve as the iteration
     let currentHead = this.head;
-    if (!this.head) {
-      return "You have nothing to delete";
-    }
 
     // if it's the head we're deleting then replace this head with the next node
-    if (this.head && this.head.value === value) {
+    if (this.head && callback(this.head.value, value)) {
+      deletedNode = this.head;
       this.head = this.head.next;
     } else {
       while (currentHead.next) {
-        if (currentHead.next.value === value) {
+        if (callback(currentHead.next.value, value)) {
+          deletedNode = currentHead.next;
           currentHead.next = currentHead.next.next;
         } else {
           currentHead = currentHead.next;
@@ -76,9 +79,11 @@ export default class LinkedList {
     }
 
     // check it the tail has to be deleted too
-    if (this.tail.value === value) {
-      this.tail = currentHead;
+    if (callback(this.tail.value, value)) {
+      this.tail = currentHead.next;
     }
+
+    return deletedNode;
   }
 
   traverse() {
