@@ -1,4 +1,4 @@
-// import LinkedListNode from "./LinkedListNode";
+import LinkedListNode from "./LinkedListNode";
 
 const defaultComparatorFunction = _.isEqual;
 class LinkedList {
