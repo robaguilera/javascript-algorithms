@@ -83,6 +83,20 @@ class PriorityQueue {
     return value;
   }
 
+  pullMax() {
+    if (!this.isQueueEmpty) {
+      this.swap(this.queue[0], this.queue.length - 1);
+      this.queue.pop();
+      this.bubbleDown();
+    }
+  }
+
+  pullMin() {
+    if (!this.isQueueEmpty) {
+      this.queue.pop();
+    }
+  }
+
   get isQueueEmpty() {
     return this.queue.length < 1;
   }
